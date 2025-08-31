@@ -1,0 +1,10 @@
+'':
+  - type: A
+    value: 198.51.100.0
+  - ttl: 600
+    type: TXT
+    value: managed-by-octodns
+
+www:
+  - type: CNAME
+    value: example.com. # trailing dot required for FQDN

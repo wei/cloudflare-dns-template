@@ -1,0 +1,45 @@
+name: Rollback DNS
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref (commit SHA, tag, or branch) to roll back to'
+        required: true
+        default: 'main'
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check secret
+        run: |
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "CLOUDFLARE_API_TOKEN is missing"
+            exit 1
+          fi
+
+      - name: Checkout target ref
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build compiled config from ref
+        run: |
+          python scripts/build_config.py
+
+      - name: Apply rollback
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          octodns-sync --config-file compiled.config.yml --doit

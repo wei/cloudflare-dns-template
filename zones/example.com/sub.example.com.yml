@@ -1,0 +1,28 @@
+'':
+  # Example subdomain A record for sub.example.com
+  - type: A
+    value: 198.51.100.0
+
+  # Example MX record for sub.example.com
+  - type: MX
+    values:
+      - exchange: mx1.example.email.
+        preference: 10
+      - exchange: mx2.example.email.
+        preference: 20
+
+  # Example TXT record for sub.example.com
+  - type: TXT
+    value: managed-by-octodns
+
+www:
+  # Example CNAME record for www.sub.example.com
+  - octodns:
+      cloudflare:
+        comment: "Example A record for example.com"
+        proxied: true
+        tags:
+          - "team:engineering"
+    ttl: 300 # with proxied=true, the TTL here will be ignored by CloudflareProvider
+    type: CNAME
+    value: sub.example.com.
